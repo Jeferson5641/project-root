@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
-export class InMemoryDBService {
+export class InMemoryDbService {
     private users = [];
 
     findOneByUsername(username: string) {
