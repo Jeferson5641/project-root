@@ -15,7 +15,9 @@ export class AuthService {
     ) { }
 
     async registerUser(username: string, email: string, password: string): Promise<void> {
-        const hashedPassword = await bcrypt.hash(password);
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(email, saltRounds);
+
         const user = { username, email, password: hashedPassword };
 
         try {

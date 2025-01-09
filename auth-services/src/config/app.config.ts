@@ -1,9 +1,9 @@
 export const jwtConstants = {
-    secret: process.env.JWT_SECRET || 'defaultSecret'
+    secret: process.env.JWT_SECRET
 };
 
 if (process.env.NODE_ENV === 'production') {
-    if (!process.env.JWT_SECRET || jwtConstants.secret === 'defaultSecret') {
+    if (!process.env.JWT_SECRET) {
         throw new Error(
             'Critical ERROR: JWT_SECRET is not defined. Please set the JWT_SECRET environment variable production.'
         );
