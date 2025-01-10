@@ -12,10 +12,10 @@ export class UsersService {
     ) { }
 
     async create(userData: CreateUserDto): Promise<User> {
-        const { email, password } = userData;
+        const { email, password, username } = userData;
 
         const existingUser = await this.userRepository.findOne({
-            where: [{ email }],
+            where: { email },
         })
 
         if (existingUser) {
@@ -26,13 +26,18 @@ export class UsersService {
         const hashedPassword = await bcrypt.hash(password, salt)
 
         const newUser = this.userRepository.create({
-            ...userData,
+            email,
+            username,
             password: hashedPassword,
         });
-        return await this.userRepository.save(newUser);
+        console.log('Creating new user: ', newUser);
+
+        const saveUser = await this.userRepository.save(newUser);
+        console.log('User created: ', saveUser);
+        return saveUser;
     }
 
-    async findUserByUsername(username: string): Promise<User | undefined> {
-        return this.userRepository.findOneBy({ username });
+    async findUserByEmail(email: string): Promise<User | undefined> {
+        return this.userRepository.findOne({ where: { email } });
     }
 }

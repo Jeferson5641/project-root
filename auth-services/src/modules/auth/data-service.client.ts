@@ -36,12 +36,24 @@ export class DataServiceClient {
         }
     }
 
+    // async findUserByEmail(email: string): Promise<any> {
+
+    //     const url = `${process.env.DATA_SERVICE_URL}/users/${email}`;
+    //     const response = await lastValueFrom(this.httpService.get(url));
+    //     console.log(`User found by email: ${response.data}`);
+    //     return response.data;  // Retorna os dados do usuário
+
+    // }
+
     async findUserByEmail(email: string): Promise<any> {
-
-        const url = `${process.env.DATA_SERVICE_URL}/users/${email}`;
-        const response = await lastValueFrom(this.httpService.get(url));
-        console.log(`User found by email: ${response.data}`);
-        return response.data;  // Retorna os dados do usuário
-
+        const url = `${process.env.DATA_SERVICE_URL}/users/email/${email}`;
+        try {
+            const response = await lastValueFrom(this.httpService.get(url));
+            console.log(`User found by email:`, response.data);
+            return response.data; // Retorna os dados do usuário
+        } catch (error) {
+            console.error(`Error finding user by email: ${email}`, error);
+            throw new UnauthorizedException('User not found or invalid credentials');
+        }
     }
 }

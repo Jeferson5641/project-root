@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { CreateUserDto } from "src/common/dto/create-user.dto";
 import { UsersService } from "./users.service";
 
@@ -15,8 +15,17 @@ export class UsersController {
     }
 
     // teste
-    @Get(':username')
-    async getUserByUsername(@Param('username') username: string) {
-        return this.usersService.findUserByUsername(username);
+    // @Get(':username')
+    // async getUserByUsername(@Param('username') username: string) {
+    //     return this.usersService.findUserByUsername(username);
+    // }
+
+    @Get('email/:email')
+    async getUserByEmail(@Param('email') email: string) {
+        const user = await this.usersService.findUserByEmail(email);
+        if (!user) {
+            throw new BadRequestException('User not found');
+        }
+        return user;
     }
 }
