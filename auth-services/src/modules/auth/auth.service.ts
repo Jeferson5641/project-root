@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from 'src/common/dto/login-user.dto';
@@ -18,7 +18,7 @@ export class AuthService {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        const user = { username, email, password: hashedPassword };
+        const user = { username, email, password };
 
         try {
             await this.dataServiceClient.createUserInDataService(user);
@@ -33,7 +33,6 @@ export class AuthService {
         }
     }
 
-    /*
     async login(loginUserDto: LoginUserDto) {
         const { email, password } = loginUserDto;
 
@@ -42,60 +41,24 @@ export class AuthService {
         const user = await this.dataServiceClient.findUserByEmail(email); // Usando 'await' para garantir que seja resolvido
 
         console.log(`{ email: email, password: password }`, user);
-
         if (!user) {
             console.error(`User not found for email: ${email}`);
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        console.log('User found:', { email: user.email, password: user.password });
-
+        console.log("///", user.password, password);
         const isPasswordValid = await bcrypt.compare(password, user.password);
-
         console.log(`Password validation result: ${isPasswordValid} `);
 
         if (!isPasswordValid) {
-            console.error(`Password mismatch for email: ${email}`);
             throw new UnauthorizedException('Invalid credentials');
         }
 
         const payload = { email: user.email, sub: user.username };
-        return { access_token: this.jwtService.sign(payload) };
+        return {
+            access_token: await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET })
+        };
     }
-    */
-    async login(loginUserDto: LoginUserDto) {
-        const { email, password } = loginUserDto;
-
-        console.log(`Attempting login for email: ${email}`);
-
-        const user = await this.dataServiceClient.findUserByEmail(email);
-
-        if (!user) {
-            console.error(`User not found for email: ${email}`);
-            throw new UnauthorizedException('Invalid email or password');
-        }
-
-        console.log('User found:', { email: user.email, password: user.password });
-
-        // Comparação direta sem bcrypt (temporário para debug)
-        if (password === 'senha-pura-para-debug') {
-            console.log('Bypassed bcrypt validation for testing');
-            const payload = { email: user.email, sub: user.username };
-            return { access_token: this.jwtService.sign(payload) };
-        }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log(`Password validation result: ${isPasswordValid}`);
-
-        if (!isPasswordValid) {
-            console.error(`Password mismatch for email: ${email}`);
-            throw new UnauthorizedException('Invalid email or password');
-        }
-
-        const payload = { email: user.email, sub: user.username };
-        return { access_token: this.jwtService.sign(payload) };
-    }
-
 
     async validateUser(email: string, password: string): Promise<any> {
         const user = await this.dataServiceClient.findUserByEmail(email); // Usando 'await'

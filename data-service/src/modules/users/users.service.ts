@@ -11,6 +11,9 @@ export class UsersService {
         private readonly userRepository: Repository<CreateUserDto>,
     ) { }
 
+    /*
+    remover toda e qualquer criptografia e autenticação jwt do banco
+    */
     async create(userData: CreateUserDto): Promise<User> {
         const { email, password, username } = userData;
 
@@ -22,8 +25,7 @@ export class UsersService {
             throw new BadRequestException('User with this email already exists');
         }
         const saltRouds = 10;
-        const salt = await bcrypt.genSalt(saltRouds);
-        const hashedPassword = await bcrypt.hash(password, salt)
+        const hashedPassword = await bcrypt.hash(password, saltRouds)
 
         const newUser = this.userRepository.create({
             email,
