@@ -3,7 +3,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CreateUserDto } from "src/common/dto/create-user.dto";
 import { User } from "src/common/entities/user.entity";
 import { Repository } from "typeorm";
-import * as bcrypt from 'bcrypt';
 
 export class UsersService {
     constructor(
@@ -11,9 +10,6 @@ export class UsersService {
         private readonly userRepository: Repository<CreateUserDto>,
     ) { }
 
-    /*
-    remover toda e qualquer criptografia e autenticação jwt do banco
-    */
     async create(userData: CreateUserDto): Promise<User> {
         const { email, password, username } = userData;
 
@@ -24,13 +20,12 @@ export class UsersService {
         if (existingUser) {
             throw new BadRequestException('User with this email already exists');
         }
-        const saltRouds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRouds)
+        console.log(existingUser);
 
         const newUser = this.userRepository.create({
             email,
             username,
-            password: hashedPassword,
+            password,
         });
         console.log('Creating new user: ', newUser);
 
