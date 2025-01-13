@@ -2,14 +2,11 @@ import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from 'src/common/dto/login-user.dto';
-import { InMemoryDbService } from 'src/common/moks/in-memory-db.service';
 import { DataServiceClient } from './data-service.client';
-// import { CreateUserDto } from 'src/common/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly inMemoryDbService: InMemoryDbService,
         private readonly jwtService: JwtService,
         private readonly dataServiceClient: DataServiceClient,
     ) { }
@@ -18,7 +15,7 @@ export class AuthService {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        const user = { username, email, password };
+        const user = { username, email, password: hashedPassword };
 
         try {
             await this.dataServiceClient.createUserInDataService(user);

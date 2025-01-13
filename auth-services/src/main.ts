@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { EnvConfig } from './config/env-variables';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -28,8 +29,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3001);
-  console.log('Auth-Service is running on http://localhost:3001');
-  console.log('Auth-Service is running on http://localhost:3001/api-docs');
+  const envConfig = app.get(EnvConfig);
+  const port = envConfig.port;
+
+  await app.listen(port);
+  console.log(`Auth-Service is running on http://localhost:${port}`);
+  console.log(`Auth-Service is running on http://localhost:${port}/api-docs`);
 }
 bootstrap();
