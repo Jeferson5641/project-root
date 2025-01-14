@@ -1,12 +1,17 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from 'src/common/dto/login-user.dto';
 import { DataServiceClient } from './data-service.client';
+import { EnvConfig } from 'src/config/env-variables';
+import { UserRegistrationFailedException } from '../exceptions/user-registration-failed.exception';
+import { UserNotFoundException } from '../exceptions/user-not-found.exception';
+import { InvalidCredentialsException } from '../exceptions/invalid-credentials.exception';
 
 @Injectable()
 export class AuthService {
     constructor(
+        private readonly envConfig: EnvConfig,
         private readonly jwtService: JwtService,
         private readonly dataServiceClient: DataServiceClient,
     ) { }
@@ -23,46 +28,39 @@ export class AuthService {
         } catch (error) {
 
             if (error.response && error.response.status === 400) {
-                throw new BadRequestException(error.response.data.message || 'User registration failed: Invalid data');
+                throw new UserRegistrationFailedException(error.response.data.message);
             }
             console.error('Error registering user:', error);
-            throw new BadRequestException('User registration failed');
+            throw new UserRegistrationFailedException();
         }
     }
 
     async login(loginUserDto: LoginUserDto) {
         const { email, password } = loginUserDto;
 
-        console.log(`Attempting login for email: ${email}`);
-
         const user = await this.dataServiceClient.findUserByEmail(email); // Usando 'await' para garantir que seja resolvido
 
-        console.log(`{ email: email, password: password }`, user);
         if (!user) {
-            console.error(`User not found for email: ${email}`);
-            throw new UnauthorizedException('Invalid credentials');
+            throw new UserNotFoundException(email);
         }
 
-        console.log("///", user.password, password);
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log(`Password validation result: ${isPasswordValid} `);
 
         if (!isPasswordValid) {
-            throw new UnauthorizedException('Invalid credentials');
+            throw new InvalidCredentialsException();
         }
 
         const payload = { email: user.email, sub: user.username };
         return {
-            access_token: await this.jwtService.signAsync(payload, { secret: process.env.JWT_SECRET })
+            access_token: await this.jwtService.signAsync(payload, { secret: this.envConfig.jwtSecret }),
         };
     }
 
     async validateUser(email: string, password: string): Promise<any> {
-        const user = await this.dataServiceClient.findUserByEmail(email); // Usando 'await'
+        const user = await this.dataServiceClient.findUserByEmail(email);
 
         if (!user) {
-            console.error(`User not found for email: ${email} `);
-            return null;
+            throw new UserNotFoundException(email);
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
