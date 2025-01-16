@@ -7,6 +7,7 @@ import { EnvConfig } from 'src/config/env-variables';
 import { UserRegistrationFailedException } from '../exceptions/user-registration-failed.exception';
 import { UserNotFoundException } from '../exceptions/user-not-found.exception';
 import { InvalidCredentialsException } from '../exceptions/invalid-credentials.exception';
+import { CreateUserDto } from 'src/common/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -56,6 +57,28 @@ export class AuthService {
         };
     }
 
+    async getUserById(id: number): Promise<any> {
+        try {
+            const user = await this.dataServiceClient.findUserById(id);
+            if (!user) {
+                throw new UserNotFoundException(`User with ID ${id} not found`);
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
+            throw new UserNotFoundException(`User with ID ${id} not found`);
+        }
+    }
+
+    async getAllUsers(): Promise<any[]> {
+        try {
+            const users = await this.dataServiceClient.findAllUsers();
+            return users;
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            throw new Error('Failed to fetch users.');
+        }
+    }
+
     async validateUser(email: string, password: string): Promise<any> {
         const user = await this.dataServiceClient.findUserByEmail(email);
 
@@ -75,5 +98,20 @@ export class AuthService {
     async generateJwtToken(user: any): Promise<string> {
         const payload = { email: user.email, sub: user.id };
         return this.jwtService.sign(payload);
+    }
+
+    async updateUser(id: number, updateUserDto: Partial<CreateUserDto>): Promise<void> {
+
+        const updateData = Object.fromEntries(
+            Object.entries(updateUserDto).filter(([_, value]) => value !== undefined)
+        );
+        if (Object.keys(updateData).length === 0) {
+            throw new Error('No fields provided for update.');
+        }
+        await this.dataServiceClient.updateUser(id, updateData);
+    }
+
+    async deleteUser(id: number): Promise<void> {
+        await this.dataServiceClient.deleteUser(id);
     }
 }
