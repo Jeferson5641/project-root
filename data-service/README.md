@@ -12,7 +12,6 @@ O **Data-Service** é responsável por gerenciar e persistir os dados dos usuár
 | **TypeScript**             | Superset do JavaScript com tipagem estática para maior segurança no desenvolvimento.                  |
 | **TypeORM**                | ORM usado para interação com bancos de dados relacionais, como MySQL e PostgreSQL.                    |
 | **MySQL2**                 | Driver para conexão com bancos de dados MySQL.                                                        |
-| **PostgreSQL (pg)**        | Driver para conexão com bancos de dados PostgreSQL.                                                   |
 | **RxJS**                   | Biblioteca para programação reativa, usada principalmente para lidar com fluxos de dados assíncronos. |
 | **Class-Validator**        | Biblioteca para validação de dados de entrada, garantindo integridade e segurança.                    |
 | **Reflect-Metadata**       | Pacote usado internamente pelo TypeScript para manipulação de metadados.                              |
