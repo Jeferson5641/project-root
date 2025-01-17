@@ -4,7 +4,7 @@
 
 O **Auth-Service** é responsável pela autenticação e gerenciamento de usuários. Ele inclui funcionalidades de registro, login e validação de usuários. Este serviço também se comunica com o **Data-Service** para persistir os dados de registro no banco de dados.
 
-## Tecnologias Utilizadas no Projeto `auth-services`
+## Tecnologias Utilizadas na API `auth-services`
 
 | **Tecnologia/Dependência** | **Descrição**                                                                                         |
 | -------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -59,7 +59,6 @@ auth-service/
 │   ├── app.module.ts                       # Módulo principal
 │   ├── main.ts                             # Inicialização da aplicação
 ├── .env                                    # Variáveis de ambiente
-├── Dockerfile                              # Configurações do Docker
 ├── package.json                            # Dependências e scripts
 └── README.md                               # Documentação
 ```
@@ -106,6 +105,7 @@ Autentica o usuário com base no email e senha.
   ```
 
 - **Resposta**:
+
   ```json
   {
     "message": "Login successful"

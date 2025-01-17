@@ -2,7 +2,7 @@ create database project_root;
 
 use project_root;
 
-CREATE TABLE users (
+CREATE TABLE user (
     id INT not null AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
