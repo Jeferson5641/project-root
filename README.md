@@ -6,7 +6,7 @@ Este projeto consiste em um sistema distribuído, desenvolvido com arquitetura d
 
 O sistema é dividido em dois serviços principais:
 
-### 1. Auth-Services
+### Auth-Services
 
 O serviço de autenticação (`auth-services`) é responsável por gerenciar o cadastro, login e validação de usuários. Ele garante que as credenciais dos usuários sejam processadas de forma segura, fornecendo funcionalidades essenciais para o controle de acesso.
 
@@ -36,7 +36,7 @@ O serviço de autenticação (`auth-services`) é responsável por gerenciar o c
 
 ---
 
-### 2. Data-Service
+### Data-Service
 
 O serviço de dados (`data-service`) é o núcleo de gestão de informações no sistema, focado no armazenamento e manipulação de dados de usuários e informações adicionais.
 
@@ -48,15 +48,14 @@ O serviço de dados (`data-service`) é o núcleo de gestão de informações no
 
 #### **Principais Tecnologias Utilizadas**
 
-| **Tecnologia**      | **Descrição**                                                                          |
-| ------------------- | -------------------------------------------------------------------------------------- |
-| **NestJS**          | Framework para construção de APIs escaláveis e modulares com TypeScript.               |
-| **TypeScript**      | Superset do JavaScript com tipagem estática, garantindo maior confiabilidade.          |
-| **TypeORM**         | ORM utilizado para a interação com bancos de dados relacionais.                        |
-| **MySQL2**          | Driver para integração com o banco de dados MySQL.                                     |
-| **PostgreSQL (pg)** | Driver para integração com o banco de dados PostgreSQL.                                |
-| **RxJS**            | Biblioteca para programação reativa, usada em operações assíncronas e fluxos de dados. |
-| **Bcrypt**          | Utilizado para segurança adicional em algumas operações de dados.                      |
+| **Tecnologia** | **Descrição**                                                                          |
+| -------------- | -------------------------------------------------------------------------------------- |
+| **NestJS**     | Framework para construção de APIs escaláveis e modulares com TypeScript.               |
+| **TypeScript** | Superset do JavaScript com tipagem estática, garantindo maior confiabilidade.          |
+| **TypeORM**    | ORM utilizado para a interação com bancos de dados relacionais.                        |
+| **MySQL2**     | Driver para integração com o banco de dados MySQL.                                     |
+| **RxJS**       | Biblioteca para programação reativa, usada em operações assíncronas e fluxos de dados. |
+| **Bcrypt**     | Utilizado para segurança adicional em algumas operações de dados.                      |
 
 #### **Em Desenvolvimento**
 

@@ -84,7 +84,7 @@ Cria um novo usuário no banco de dados.
 
 ```plaintext
 DB_HOST=localhost
-DB_PORT=3306
+DB_PORT=your_port
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 DB_DATABASE=auth_db
