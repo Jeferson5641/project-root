@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { LoginUserDto } from 'src/common/dto/login-user.dto';
-import { DataServiceClient } from './data-service.client';
-import { EnvConfig } from 'src/config/env-variables';
-import { UserRegistrationFailedException } from '../exceptions/user-registration-failed.exception';
-import { UserNotFoundException } from '../exceptions/user-not-found.exception';
-import { InvalidCredentialsException } from '../exceptions/invalid-credentials.exception';
 import { CreateUserDto } from 'src/common/dto/create-user.dto';
+import { LoginUserDto } from 'src/common/dto/login-user.dto';
+import { EnvConfig } from 'src/config/env-variables';
+import { GenericHttpException } from '../exceptions/generic-http.exception';
+import { InvalidCredentialsException } from '../exceptions/invalid-credentials.exception';
+import { UserNotFoundException } from '../exceptions/user-not-found.exception';
+import { UserRegistrationFailedException } from '../exceptions/user-registration-failed.exception';
+import { DataServiceClient } from './data-service.client';
+import { NoFieldsProvidedException } from '../exceptions/no-fields-provided.exception';
 
 @Injectable()
 export class AuthService {
@@ -39,22 +41,32 @@ export class AuthService {
     async login(loginUserDto: LoginUserDto) {
         const { email, password } = loginUserDto;
 
-        const user = await this.dataServiceClient.findUserByEmail(email); // Usando 'await' para garantir que seja resolvido
+        try {
 
-        if (!user) {
-            throw new UserNotFoundException(email);
+            const user = await this.dataServiceClient.findUserByEmail(email); // Usando 'await' para garantir que seja resolvido
+
+            if (!user) {
+                throw new UserNotFoundException(email);
+            }
+
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordValid) {
+                throw new InvalidCredentialsException();
+            }
+
+            const payload = { email: user.email, sub: user.username };
+            return {
+                access_token: await this.jwtService.signAsync(payload, { secret: this.envConfig.jwtSecret }),
+            };
+        } catch (error) {
+            console.error('Error during login: ', error);
+            if (error instanceof UserNotFoundException || error instanceof InvalidCredentialsException) {
+                throw error;
+            }
+            throw new GenericHttpException(error.response?.status || 'Failed to login.', 500);
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            throw new InvalidCredentialsException();
-        }
-
-        const payload = { email: user.email, sub: user.username };
-        return {
-            access_token: await this.jwtService.signAsync(payload, { secret: this.envConfig.jwtSecret }),
-        };
     }
 
     async getUserById(id: number): Promise<any> {
@@ -66,7 +78,10 @@ export class AuthService {
             return user;
         } catch (error) {
             console.error('Error fetching user:', error);
-            throw new UserNotFoundException(`User with ID ${id} not found`);
+            if (error instanceof UserNotFoundException) {
+                throw error;
+            }
+            throw new GenericHttpException(error.response?.status || `Failed to fetch user with ID ${id}.`, 500);
         }
     }
 
@@ -76,24 +91,32 @@ export class AuthService {
             return users;
         } catch (error) {
             console.error('Error fetching users:', error);
-            throw new Error('Failed to fetch users.');
+            throw new GenericHttpException(error.response?.status || 'Failed to fetch users.', 500);
         }
     }
 
     async validateUser(email: string, password: string): Promise<any> {
-        const user = await this.dataServiceClient.findUserByEmail(email);
+        try {
+            const user = await this.dataServiceClient.findUserByEmail(email);
 
-        if (!user) {
-            throw new UserNotFoundException(email);
+            if (!user) {
+                throw new UserNotFoundException(email);
+            }
+
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+
+            if (isPasswordValid) {
+                const { password, ...result } = user;
+                return result;
+            }
+            throw new InvalidCredentialsException();
+        } catch (error) {
+            console.error('Error validation: ', error)
+            if (error instanceof UserNotFoundException || error instanceof InvalidCredentialsException) {
+                throw error;
+            }
+            throw new GenericHttpException(error.response?.status || 'Failed to validate user.', 500);
         }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (isPasswordValid) {
-            const { password, ...result } = user;
-            return result;
-        }
-        return null;
     }
 
     async generateJwtToken(user: any): Promise<string> {
@@ -102,22 +125,33 @@ export class AuthService {
     }
 
     async updateUser(id: number, updateUserDto: Partial<CreateUserDto>): Promise<void> {
-
         const updateData = Object.fromEntries(
             Object.entries(updateUserDto).filter(([_, value]) => value !== undefined)
         );
+
         if (Object.keys(updateData).length === 0) {
-            throw new Error('No fields provided for update.');
+            throw new NoFieldsProvidedException();
         }
 
         if (updateData.password) {
             const saltRounds = 10;
             updateData.password = await bcrypt.hash(updateData.password, saltRounds);
         }
-        await this.dataServiceClient.updateUser(id, updateData);
+
+        try {
+            await this.dataServiceClient.updateUser(id, updateData);
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw new GenericHttpException(error.response?.status || `Failed to update user with ID ${id}.`, 500);
+        }
     }
 
     async deleteUser(id: number): Promise<void> {
-        await this.dataServiceClient.deleteUser(id);
+        try {
+            await this.dataServiceClient.deleteUser(id);
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            throw new GenericHttpException(error.response?.status || `Failed to update user with ID ${id}.`, 500);
+        }
     }
 }
