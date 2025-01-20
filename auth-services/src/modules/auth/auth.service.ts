@@ -109,6 +109,11 @@ export class AuthService {
         if (Object.keys(updateData).length === 0) {
             throw new Error('No fields provided for update.');
         }
+
+        if (updateData.password) {
+            const saltRounds = 10;
+            updateData.password = await bcrypt.hash(updateData.password, saltRounds);
+        }
         await this.dataServiceClient.updateUser(id, updateData);
     }
 
