@@ -63,6 +63,7 @@ export class AuthService {
             if (!user) {
                 throw new UserNotFoundException(`User with ID ${id} not found`);
             }
+            return user;
         } catch (error) {
             console.error('Error fetching user:', error);
             throw new UserNotFoundException(`User with ID ${id} not found`);

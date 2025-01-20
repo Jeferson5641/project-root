@@ -56,7 +56,7 @@ export class DataServiceClient {
     async findUserById(id: number): Promise<any> {
         //const url = this.envConfig.dataServiceUrl;
         try {
-            const response = await this.httpService.axiosRef.get(`{${this.envConfig.dataServiceUrl}/users/one/${id}}`);
+            const response = await this.httpService.axiosRef.get(`${this.envConfig.dataServiceUrl}/users/one/${id}`);
             return response.data;
         } catch (error) {
             console.error(`Error fetching user by ID ${id}:`, error.message);
