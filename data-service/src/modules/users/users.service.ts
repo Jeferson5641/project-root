@@ -3,6 +3,9 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CreateUserDto } from "src/common/dto/create-user.dto";
 import { User } from "src/common/entities/user.entity";
 import { Repository } from "typeorm";
+import { EmailAlreadyExistsException } from "../exceptions/email-already-exists.exception";
+import { UserNotFoundByEmailException } from "../exceptions/user-not-found-by-email.exception";
+import { UserNotFoundByIdException } from "../exceptions/user-not-found-by-id.exception";
 
 export class UsersService {
     constructor(
@@ -18,7 +21,7 @@ export class UsersService {
         })
 
         if (existingUser) {
-            throw new BadRequestException('User with this email already exists');
+            throw new EmailAlreadyExistsException(email);
         }
         console.log(existingUser);
 
@@ -35,7 +38,11 @@ export class UsersService {
     }
 
     async findUserByEmail(email: string): Promise<User | undefined> {
-        return this.userRepository.findOne({ where: { email } });
+        const user = this.userRepository.findOne({ where: { email } });
+        if (!user) {
+            throw new UserNotFoundByEmailException(email);
+        }
+        return user;
     }
 
     async findAllUser(): Promise<any[]> {
@@ -45,7 +52,7 @@ export class UsersService {
     async findUserById(id: number): Promise<User> {
         const user = await this.userRepository.findOne({ where: { id } });
         if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new UserNotFoundByIdException(id);
         }
         return user;
     }
@@ -54,7 +61,7 @@ export class UsersService {
         const user = await this.userRepository.findOneBy({ id }); // Reutiliza o método `findUserById` para validação
 
         if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new UserNotFoundByIdException(id);
         }
 
         Object.assign(user, updateData);
