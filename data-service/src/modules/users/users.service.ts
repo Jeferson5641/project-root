@@ -73,7 +73,7 @@ export class UsersService {
         const user = await this.findUserById(id); // Valida a existência do usuário
 
         if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new UserNotFoundByIdException(id);;
         }
 
         await this.userRepository.delete(user.id);
