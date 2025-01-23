@@ -681,19 +681,28 @@
     webpack "5.97.1"
     webpack-node-externals "3.0.0"
 
-"@nestjs/common@^11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-11.0.3.tgz#0deb7aec8087f088b78cc1ef102b81a4ad097a33"
-  integrity sha512-fTkJWQ20+jvPKfrv3A+T3wsPwwYSJyoJ+pcBzyKtv5fCpK/yX/rJalFUIpw1CDmarfqIaMX9SdkplNyxtvH6RA==
+"@nestjs/common@^11.0.5":
+  version "11.0.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-11.0.5.tgz#5de2ee2062c3098ddb42e42e7ad976cae6945201"
+  integrity sha512-wKvdqC1s0A3VguR97DDpnnjQhi8p+9FmMVWFQCZYzoURXXFgsyuZZiUi7VjfyM/ewG4IV2vPUXdmkry+KXYh0A==
   dependencies:
     uid "2.0.2"
     iterare "1.2.1"
     tslib "2.8.1"
 
-"@nestjs/core@^11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-11.0.3.tgz#a3e836f725242b788bb48454c34d05b9658c1557"
-  integrity sha512-6UoVHpwa23HJxMNtuTXQCiqx/NHTG3lRBRgnZ8EDHTjgaNnR7P+xBS68zN3gLH7rBIrhhQ5Q1hVs7WswRxrw7Q==
+"@nestjs/config@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/config/-/config-4.0.0.tgz#b560fbd07e8083bc3c8d66afdb2a98f5882c5853"
+  integrity sha512-hyhUMtVwlT+tavtPNyekl8iP0QTU1U6awKrgdOSxhMhp3TQMltx7hz2yqGTcARp+19zWPfgJudyxthuD3lPp/Q==
+  dependencies:
+    dotenv "16.4.7"
+    dotenv-expand "12.0.1"
+    lodash "4.17.21"
+
+"@nestjs/core@^11.0.5":
+  version "11.0.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-11.0.5.tgz#0716db5f1711b7ca75fe10cebeb7cc97f4f2b472"
+  integrity sha512-6cYkndsBV2GrPuHecBFg4neE2P87PmlhumSwfHonn78aI6NyMlWfA+HCJr5Y+7uy6CiTLwJCNiqLhiM/TZjjeA==
   dependencies:
     uid "2.0.2"
     "@nuxt/opencollective" "0.4.1"
@@ -710,18 +719,18 @@
     "@types/jsonwebtoken" "9.0.7"
     jsonwebtoken "9.0.2"
 
-"@nestjs/microservices@^11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/microservices/-/microservices-11.0.3.tgz#5cd944c45f95f1a8f421d002c0a84af7b77fce7b"
-  integrity sha512-NZ4kLEGnBtjI7h39DKDYEvmMxiCPU2IX57w09CVwl/W2FDQ+/2SlVwk9cvEo39jV79uAOlnBOma7uQo4QfhLAQ==
+"@nestjs/microservices@^11.0.5":
+  version "11.0.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/microservices/-/microservices-11.0.5.tgz#1bb228c11bc462953b038a3bd20bc8d791d46faf"
+  integrity sha512-nO3cgXhGr02OSP9Q3/1npY/7b9ABWuBnVkhd8cJ7zpYlsYslxjtvIgCAoGtrI7rdVXi2qvysLx6AEww1FZ4mtg==
   dependencies:
     iterare "1.2.1"
     tslib "2.8.1"
 
-"@nestjs/platform-express@^11.0.3":
-  version "11.0.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-11.0.3.tgz#939e84e340e27e0a55021f7c19b6f88a9103ba7c"
-  integrity sha512-KFzxOjd7FYOBR3AtUnhbTHi3LdDpMT3sWSNT/DqTD6t/dEfk/FtgCE7ZtNnIuPY1KTvP68BW40VVcwauyvRJwg==
+"@nestjs/platform-express@^11.0.5":
+  version "11.0.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-11.0.5.tgz#765b269991b2b0cb5b3b7c8257450625421c380d"
+  integrity sha512-nG/doauKHuy27Y/3pUKfQFC+mB8ezPayZ/4hTDaysITsOVLBrd7xtS0DW68kSufXnLhIkPgAfB9Ddhm/NHux4g==
   dependencies:
     cors "2.8.5"
     express "5.0.1"
@@ -2032,6 +2041,18 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+dotenv-expand@12.0.1:
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-12.0.1.tgz#44bdfa204a368100689ec35d7385755f599ceeb1"
+  integrity sha512-LaKRbou8gt0RNID/9RoI+J2rvXsBRPMV7p+ElHlPhcSARbCPDYcYG2s1TIzAfWv4YSgyY5taidWzzs31lNV3yQ==
+  dependencies:
+    dotenv "^16.4.5"
+
+dotenv@16.4.7, dotenv@^16.4.5:
+  version "16.4.7"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.7.tgz#0e20c5b82950140aa99be360a8a5f52335f53c26"
+  integrity sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==
 
 dunder-proto@^1.0.1:
   version "1.0.1"
@@ -3598,7 +3619,7 @@ lodash.once@^4.0.0:
   resolved "https://registry.yarnpkg.com/lodash.once/-/lodash.once-4.1.1.tgz#0dd3971213c7c56df880977d504c88fb471a97ac"
   integrity sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==
 
-lodash@^4.17.21:
+lodash@4.17.21, lodash@^4.17.21:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
