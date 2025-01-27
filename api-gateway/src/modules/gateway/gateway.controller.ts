@@ -1,10 +1,13 @@
-import { All, Body, Controller, HttpException, HttpStatus, Post, Request, Response } from "@nestjs/common";
+import { All, Body, Controller, HttpException, HttpStatus, Logger, Post, Request, Response } from "@nestjs/common";
 import { GatewayService } from "./gateway.service";
 import { routeMappings } from "../mapper/route-mapping";
 import { AuthMiddleware } from "../middlewares/gateway-middlewares";
 
 @Controller()
 export class GatewayController {
+
+    private readonly logger = new Logger(GatewayController.name);
+
     constructor(private readonly gatewayService: GatewayService) { }
 
     @All('*')
