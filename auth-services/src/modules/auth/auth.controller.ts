@@ -1,8 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UnauthorizedException } from "@nestjs/common";
-import { ApiBody, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateUserDto } from "src/common/dto/create-user.dto";
 import { LoginUserDto } from "src/common/dto/login-user.dto";
 import { AuthService } from "./auth.service";
+import { UpdateUserDto } from "src/common/dto/update-user.dto";
 
 @ApiTags('auth')
 @Controller('auth')
@@ -12,6 +13,7 @@ export class AuthController {
     @Post('register')
     @ApiResponse({ status: 201, description: 'User registered successfully' })
     @ApiResponse({ status: 400, description: 'User registered failed' })
+    @ApiBody({ type: CreateUserDto })
     async register(@Body() createUserDto: CreateUserDto) {
         await this.authService.registerUser(createUserDto.username, createUserDto.email, createUserDto.password);
         return { message: 'User registered successfully' };
@@ -37,12 +39,17 @@ export class AuthController {
     }
 
     @Get('one/:id')
+    @ApiResponse({ status: 200, description: 'User retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    @ApiResponse({ status: 403, description: 'Access denied' })
     async getUserById(@Param('id') id: string) {
         const user = await this.authService.getUserById(Number(id));
         return user;
     }
 
     @Get('all')
+    @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
+    @ApiResponse({ status: 403, description: 'Access denied' })
     async getAllUsers() {
         const users = await this.authService.getAllUsers();
         return users;
@@ -52,9 +59,10 @@ export class AuthController {
     @Put('update/:id')
     @ApiResponse({ status: 200, description: 'User updated successfully' })
     @ApiResponse({ status: 400, description: 'Failed to update user' })
+    @ApiBody({ type: UpdateUserDto })
     async updateUser(
         @Param('id') id: string,
-        @Body() updateUserDto: Partial<CreateUserDto>,
+        @Body() updateUserDto: UpdateUserDto = {},
     ) {
         await this.authService.updateUser(Number(id), updateUserDto);
         return { message: 'User updated successfully' };
