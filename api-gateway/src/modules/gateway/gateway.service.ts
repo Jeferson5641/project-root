@@ -39,7 +39,7 @@ export class GatewayService {
         } catch (error) {
             this.logger.error(`Error forwarding request to ${service}-service: ${error.message}`);
             this.logger.error(`Error details: ${JSON.stringify(error.response?.data || error.message)}`);
-            throw new InternalServerErrorException(`Failed to communicate with ${service}-service`);
+            throw new InternalServerErrorException(`Failed to communicate with ${service}-service. Error: ${error.message}`);
         }
     }
 }
