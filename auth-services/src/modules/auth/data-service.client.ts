@@ -53,7 +53,7 @@ export class DataServiceClient {
         }
     }
 
-    async findUserById(id: number): Promise<any> {
+    async findUserById(id: number): Promise<any[]> {
         const url = `${this.envConfig.dataServiceUrl}/users/one/${id}`;
         try {
             const response = await lastValueFrom(this.httpService.get(url));

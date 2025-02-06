@@ -8,7 +8,7 @@ export class EnvConfig {
     }
 
     private validateEnvVariables(): void {
-        const requiredVariables = ['DATA_SERVICE_URL', 'AUTH_SERVICES_URL'];
+        const requiredVariables = ['DATA_SERVICE_URL', 'DATA_SERVICE_URL2', 'AUTH_SERVICES_URL', 'AUTH_SERVICES_URL2'];
 
         requiredVariables.forEach(variable => {
             if (!process.env[variable]) {
@@ -23,8 +23,15 @@ export class EnvConfig {
         return this.configService.get('DATA_SERVICE_URL');
     }
 
-    get authServiceUrl(): string {
+    get dataServiceUrl2(): string {
+        return this.configService.get('DATA_SERVICE_URL2');
+    }
+
+    get authServicesUrl(): string {
         return this.configService.get('AUTH_SERVICES_URL');
+    }
+    get authServicesUrl2(): string {
+        return this.configService.get('AUTH_SERVICES_URL2');
     }
 
     get port(): string {

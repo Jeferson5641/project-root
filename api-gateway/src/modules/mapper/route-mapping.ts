@@ -17,8 +17,8 @@ export const routeMappings = [
     },
     {
         gatewayPath: '/users/one/:id',
-        targetPath: '/users/one/:id',
-        service: 'data',
+        targetPath: '/auth/one/:id',
+        service: 'auth',
         method: 'GET',
         protected: false,
         validatePayload: false,
@@ -33,8 +33,8 @@ export const routeMappings = [
     },
     {
         gatewayPath: '/users/update/:id',
-        targetPath: '/auth/update/:id',
-        service: 'auth',
+        targetPath: '/users/update/:id',
+        service: 'data',
         method: 'PUT',
         protected: false,
         validatePayload: true,
