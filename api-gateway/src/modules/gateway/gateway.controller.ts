@@ -2,8 +2,11 @@ import { All, Body, Controller, HttpException, HttpStatus, Logger, Post, Request
 import { GatewayService } from "./gateway.service";
 import { routeMappings } from "../mapper/route-mapping";
 import { AuthMiddleware } from "../middlewares/gateway-middlewares";
+import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { GatewayRouteDto } from "../swagger/gateway-route.dto";
 
-@Controller()
+@ApiTags('Gateway')
+@Controller('gateway')
 export class GatewayController {
 
     private readonly logger = new Logger(GatewayController.name);
@@ -11,6 +14,15 @@ export class GatewayController {
     constructor(private readonly gatewayService: GatewayService) { }
 
     @All('*')
+    @ApiOperation({
+        summary: 'Encaminha a requisição para o serviço correto',
+        description: 'Este endpoint atua como um roteador de requisições, direcionando para os serviços apropriados.'
+    })
+    @ApiResponse({ status: 200, description: 'Requisição processada com sucesso.' })
+    @ApiResponse({ status: 400, description: 'Payload inválido.' })
+    @ApiResponse({ status: 404, description: 'Rota não encontrada.' })
+    @ApiResponse({ status: 500, description: 'Erro interno do servidor.' })
+    @ApiBody({ type: GatewayRouteDto, required: false, description: 'Payload opcional para requisições POST e PUT' })
     async handleRequest(@Request() req, @Body() body, @Response() res) {
         const matchingRoute = routeMappings.find(route => {
             const regex = new RegExp(`^${route.gatewayPath.replace(/:\w+/g, '\\w+')}$`);
