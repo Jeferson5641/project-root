@@ -43,7 +43,7 @@ export class GatewayService {
     async forwardRequest(service: string, targetPath: string, method: string, data?: any) {
         const instances = this.getNextInstance(service);
 
-        this.logger.log(`Encaminhando requisição para: ${instances.defaults.baseURL}${targetPath} com método ${method} e dados: ${JSON.stringify(data)}`);
+        this.logger.log(`Forwarding request to: ${instances.defaults.baseURL}${targetPath} with method ${method} and data: ${JSON.stringify(data)}`);
 
         const response = await instances.request({
             url: targetPath,

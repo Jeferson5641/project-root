@@ -5,6 +5,9 @@ import { GatewayRouteDto } from "../swagger/gateway-route.dto";
 import { GatewayService } from "./gateway.service";
 import { Response } from "express";
 import { Guard } from "../middlewares/guard";
+import { NotFoundException } from "../exceptions/not-found.exception";
+import { BadRequestException } from "../exceptions/bad-request.exception";
+import { InternalServerException } from "../exceptions/internal-server.exception";
 
 @ApiTags('Gateway')
 @Controller('gateway')
@@ -16,19 +19,19 @@ export class GatewayController {
 
     @All('*')
     @ApiOperation({
-        summary: 'Encaminha a requisição para o serviço correto',
-        description: 'Este endpoint atua como um roteador de requisições, direcionando para os serviços apropriados.'
+        summary: 'Forwards the request to the correct service',
+        description: 'This endpoint acts as a request router, directing them to the appropriate services.'
     })
-    @ApiResponse({ status: 200, description: 'Requisição processada com sucesso.' })
-    @ApiResponse({ status: 400, description: 'Payload inválido.' })
-    @ApiResponse({ status: 404, description: 'Rota não encontrada.' })
-    @ApiResponse({ status: 500, description: 'Erro interno do servidor.' })
-    @ApiBody({ type: GatewayRouteDto, required: false, description: 'Payload opcional para requisições POST e PUT' })
+    @ApiResponse({ status: 200, description: 'Request processed successfully.' })
+    @ApiResponse({ status: 400, description: 'Invalid payload.' })
+    @ApiResponse({ status: 404, description: 'Route not found.' })
+    @ApiResponse({ status: 500, description: 'Internal server error.' })
+    @ApiBody({ type: GatewayRouteDto, required: false, description: 'Optional payload for POST and PUT requests' })
     async handleRequest(@Request() req, @Body() body, @Res() res: Response) {
         this.logger.log(`Original URL: ${req.originalUrl}`);
 
         const path = req.originalUrl.replace('/gateway', '');
-        this.logger.log(`Recebendo requisição para o caminho: ${path}`);
+        this.logger.log(`Receiving request for path: ${path}`);
 
         const matchingRoute = routeMappings.find(route => {
             const regex = new RegExp(`^${route.gatewayPath.replace(/:[^/]+/g, '([^/]+)')}$`);
@@ -36,11 +39,11 @@ export class GatewayController {
         });
 
         if (!matchingRoute) {
-            this.logger.error(`Rota não encontrada: ${req.originalUrl}`);
-            throw new HttpException('Route not found', HttpStatus.NOT_FOUND);
+            this.logger.error(`Route not found: ${req.originalUrl}`);
+            throw new NotFoundException();
         }
 
-        this.logger.log(`Rota correspondente encontrada: ${JSON.stringify(matchingRoute)}`);
+        this.logger.log(`Matching route found: ${JSON.stringify(matchingRoute)}`);
 
         const { service, protected: isProtected, validatePayload } = matchingRoute;
 
@@ -67,7 +70,7 @@ export class GatewayController {
 
         // Validação de Payload (se necessário)
         if (validatePayload && !body) {
-            throw new HttpException('Payload inválido', HttpStatus.BAD_REQUEST);
+            throw new BadRequestException();
         }
 
         // Redirecionamento para o serviço alvo
@@ -75,8 +78,8 @@ export class GatewayController {
             const result = await this.gatewayService.forwardRequest(service, finalPath, req.method, body);
             res.status(200).send(result);
         } catch (error) {
-            this.logger.error(`Erro ao redirecionar a requisição: ${error.message}`);
-            res.status(error.response?.status || 500).send({ message: 'Erro interno do servidor' });
+            this.logger.error(`Error redirecting request: ${error.message}`);
+            throw new InternalServerException(error.message);
         }
     }
 }

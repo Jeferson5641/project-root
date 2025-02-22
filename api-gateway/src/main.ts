@@ -47,29 +47,3 @@ async function bootstrap() {
   console.log(`Swagger is running on http://localhost:${port}/api-docs`);
 }
 bootstrap();
-
-// @Controller()
-// class TesteController {
-//   @Get()
-//   getHello(): string {
-//     return 'Hello World!';
-//   }
-
-// }
-// @Module({
-//   controllers: [TesteController],
-// })
-// class TesteApi { }
-
-// async function bootstrap() {
-//   const app = await NestFactory.create<NestFastifyApplication>(
-//     TesteApi,
-//   );
-
-//   const port = 3003;
-
-//   await app.listen(port);
-//   console.log(`Gateway is running on http://localhost:${port}`);
-//   console.log(`Swagger is running on http://localhost:${port}/api-docs`);
-// }
-// bootstrap();
