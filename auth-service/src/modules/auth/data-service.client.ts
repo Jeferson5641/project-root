@@ -1,27 +1,27 @@
 import { HttpService } from "@nestjs/axios";
-import { BadRequestException, Injectable, InternalServerErrorException, Logger, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { lastValueFrom } from "rxjs";
 import { CreateUserDto } from "src/common/dto/create-user.dto";
 import { EnvConfig } from "src/config/env-variables";
-import { InvalidCredentialsException } from "../exceptions/invalid-credentials.exception";
-import { UserNotFoundException } from "../exceptions/user-not-found.exception";
-import { UserRegistrationFailedException } from "../exceptions/user-registration-failed.exception";
 import { DataServiceUnavailableException } from "../exceptions/dataservice-unavailable.exception";
-import { UserUpdateFailedException } from "../exceptions/user-update-failed.exception";
 import { GenericHttpException } from "../exceptions/generic-http.exception";
+import { UserNotFoundException } from "../exceptions/user-not-found.exception";
+import { UserUpdateFailedException } from "../exceptions/user-update-failed.exception";
 
 @Injectable()
 export class DataServiceClient {
     private readonly logger = new Logger(DataServiceClient.name);
+    private readonly dataServiceUrl: string;
 
     constructor(
         private readonly httpService: HttpService,
-        private readonly envConfig: EnvConfig
-    ) { }
+        private readonly envConfig: EnvConfig,
+    ) {
+        this.dataServiceUrl = this.envConfig.dataServiceUrl;
+    }
 
     async createUserInDataService(user: { username: string; email: string; password: string }): Promise<any> {
-        // const dataServiceUrl = this.envConfig.dataServiceUrl;
-        const url = `${this.envConfig.dataServiceUrl}/users/create`;
+        const url = `${this.dataServiceUrl}/users/create`;
 
         try {
             const response = await lastValueFrom(
@@ -41,7 +41,7 @@ export class DataServiceClient {
     }
 
     async findUserByEmail(email: string): Promise<any> {
-        const url = `${this.envConfig.dataServiceUrl}/users/email/${email}`;
+        const url = `${this.dataServiceUrl}/users/email/${email}`;
         try {
             const response = await lastValueFrom(this.httpService.get(url));
             return response.data; // Retorna os dados do usuário
@@ -54,7 +54,7 @@ export class DataServiceClient {
     }
 
     async findUserById(id: number): Promise<any[]> {
-        const url = `${this.envConfig.dataServiceUrl}/users/one/${id}`;
+        const url = `${this.dataServiceUrl}/users/one/${id}`;
         try {
             const response = await lastValueFrom(this.httpService.get(url));
             return response.data;
@@ -67,7 +67,7 @@ export class DataServiceClient {
     }
 
     async findAllUsers(): Promise<any[]> {
-        const url = `${this.envConfig.dataServiceUrl}/users/all`;
+        const url = `${this.dataServiceUrl}/users/all`;
         try {
             const response = await this.httpService.axiosRef.get(url);
             this.logger.log(`Fetched all users successfuly.`);
@@ -84,7 +84,7 @@ export class DataServiceClient {
     }
 
     async updateUser(id: number, updateUserDto: Partial<CreateUserDto>) {
-        const url = `${this.envConfig.dataServiceUrl}/users/update/${id}`;
+        const url = `${this.dataServiceUrl}/users/update/${id}`;
 
         try {
             const response = await lastValueFrom(this.httpService.put(url, updateUserDto));
@@ -98,7 +98,7 @@ export class DataServiceClient {
     }
 
     async deleteUser(id: number) {
-        const url = `${this.envConfig.dataServiceUrl}/users/delete/${id}`;
+        const url = `${this.dataServiceUrl}/users/delete/${id}`;
         try {
             await lastValueFrom(this.httpService.delete(url));
             this.logger.log(`User with ID ${id} deleted successfully.`);

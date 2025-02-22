@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from 'src/common/dto/create-user.dto';
 import { LoginUserDto } from 'src/common/dto/login-user.dto';
 import { EnvConfig } from 'src/config/env-variables';
 import { GenericHttpException } from '../exceptions/generic-http.exception';
 import { InvalidCredentialsException } from '../exceptions/invalid-credentials.exception';
+import { NoFieldsProvidedException } from '../exceptions/no-fields-provided.exception';
 import { UserNotFoundException } from '../exceptions/user-not-found.exception';
 import { UserRegistrationFailedException } from '../exceptions/user-registration-failed.exception';
 import { DataServiceClient } from './data-service.client';
-import { NoFieldsProvidedException } from '../exceptions/no-fields-provided.exception';
 
 @Injectable()
 export class AuthService {
@@ -20,8 +20,7 @@ export class AuthService {
     ) { }
 
     async registerUser(username: string, email: string, password: string): Promise<void> {
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const hashedPassword = await this.hashPassword(password);
 
         const user = { username, email, password: hashedPassword };
 
@@ -49,7 +48,7 @@ export class AuthService {
                 throw new UserNotFoundException(email);
             }
 
-            const isPasswordValid = await bcrypt.compare(password, user.password);
+            const isPasswordValid = await this.comparePasswords(password, user.password);
 
             if (!isPasswordValid) {
                 throw new InvalidCredentialsException();
@@ -103,7 +102,7 @@ export class AuthService {
                 throw new UserNotFoundException(email);
             }
 
-            const isPasswordValid = await bcrypt.compare(password, user.password);
+            const isPasswordValid = await this.comparePasswords(password, user.password);
 
             if (isPasswordValid) {
                 const { password, ...result } = user;
@@ -134,8 +133,7 @@ export class AuthService {
         }
 
         if (updateData.password) {
-            const saltRounds = 10;
-            updateData.password = await bcrypt.hash(updateData.password, saltRounds);
+            updateData.password = await this.hashPassword(updateData.password);
         }
 
         try {
@@ -153,5 +151,13 @@ export class AuthService {
             console.error('Error deleting user:', error);
             throw new GenericHttpException(error.response?.status || `Failed to update user with ID ${id}.`, 500);
         }
+    }
+
+    async hashPassword(password: string): Promise<string> {
+        return bcrypt.hash(password, 10);
+    }
+
+    async comparePasswords(password: string, hash: string): Promise<boolean> {
+        return bcrypt.compare(password, hash);
     }
 }
