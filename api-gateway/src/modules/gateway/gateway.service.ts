@@ -1,6 +1,6 @@
-import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
-import axios, { AxiosInstance } from "axios";
-import { EnvConfig } from "../environment/env-variables";
+import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { EnvConfig } from "src/config/env-variables";
 
 @Injectable()
 export class GatewayService {
@@ -8,16 +8,13 @@ export class GatewayService {
     private readonly serviceClients: Record<string, AxiosInstance[]>;
     private readonly roundRobinIndexes: Record<string, number>;
 
-    constructor(
-        private readonly envConfig: EnvConfig,
-    ) {
+    constructor(private readonly envConfig: EnvConfig) {
         this.logger.log('Initializing GatewayService');
 
         const authInstances = [
-
-            axios.create({ baseURL: `${this.envConfig.authServicesUrl}` }),
-            axios.create({ baseURL: `${this.envConfig.authServicesUrl2}` }),
-        ]
+            axios.create({ baseURL: `${this.envConfig.authServiceUrl}` }),
+            axios.create({ baseURL: `${this.envConfig.authServiceUrl2}` }),
+        ];
 
         const dataInstances = [
             axios.create({ baseURL: `${this.envConfig.dataServiceUrl}` }),
@@ -32,46 +29,28 @@ export class GatewayService {
         this.roundRobinIndexes = {
             auth: 0,
             data: 0,
-        }
+        };
         this.logger.log(`Service Clients Initialized: ${JSON.stringify(Object.keys(this.serviceClients))}`);
     }
 
     private getNextInstance(service: string): AxiosInstance {
         const instances = this.serviceClients[service];
-        if (!instances) {
-            throw new InternalServerErrorException(`Service ${service} not found`);
-        }
-
-        const index = this.roundRobinIndexes[service] ?? 0;
-        const instance = instances[index];
-
+        const index = this.roundRobinIndexes[service];
         this.roundRobinIndexes[service] = (index + 1) % instances.length;
-
-        return instance;
+        return instances[index];
     }
 
     async forwardRequest(service: string, targetPath: string, method: string, data?: any) {
+        const instances = this.getNextInstance(service);
 
-        this.logger.log(`Forwarding request - Service: ${service}, Path: ${targetPath}, Method: ${method}`);
-        if (data) {
-            this.logger.debug(`Request payload: ${JSON.stringify(data)}`);
-        }
+        this.logger.log(`Encaminhando requisição para: ${instances.defaults.baseURL}${targetPath} com método ${method} e dados: ${JSON.stringify(data)}`);
 
-        try {
-            const client = this.getNextInstance(service);
-            const response = await client.request({
-                url: targetPath,
-                method,
-                data,
-            });
+        const response = await instances.request({
+            url: targetPath,
+            method,
+            data,
+        });
+        return response.data;
 
-            this.logger.log(`Response received from ${service}-service`);
-            this.logger.debug(`Response data: ${JSON.stringify(response.data)}`);
-            return response.data;
-        } catch (error) {
-            this.logger.error(`Error forwarding request to ${service}-service: ${error.message}`);
-            this.logger.error(`Error details: ${JSON.stringify(error.response?.data || error.message)}`);
-            throw new InternalServerErrorException(`Failed to communicate with ${service}-service. Error: ${error.message}`);
-        }
     }
 }

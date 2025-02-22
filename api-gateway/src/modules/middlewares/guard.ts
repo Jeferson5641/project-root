@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/commo
 import { NextFunction, Request, Response } from "express";
 
 @Injectable()
-export class AuthMiddleware implements NestMiddleware {
+export class Guard implements NestMiddleware {
     use(req: Request, res: Response, next: NextFunction) {
         const authHeader = req.headers.authorization;
 

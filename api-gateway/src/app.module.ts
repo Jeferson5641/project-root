@@ -1,12 +1,18 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppService } from './app.service';
-import { GatewayModule } from './modules/gateway/gateway.module';
+import { EnvConfig } from './config/env-variables';
 import { GatewayController } from './modules/gateway/gateway.controller';
-import { EnvConfigModule } from './modules/environment/env-config.module';
+import { GatewayService } from './modules/gateway/gateway.service';
 
 @Module({
-  imports: [GatewayModule, EnvConfigModule],
-  controllers: [],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
+  controllers: [GatewayController],
+  providers: [AppService, EnvConfig, GatewayService],
+  exports: [EnvConfig],
 })
 export class AppModule { }

@@ -1,9 +1,10 @@
-import { All, Body, Controller, HttpException, HttpStatus, Logger, Post, Request, Response } from "@nestjs/common";
-import { GatewayService } from "./gateway.service";
+import { All, Body, Controller, HttpException, HttpStatus, Logger, Request, Res } from "@nestjs/common";
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { routeMappings } from "../mapper/route-mapping";
-import { AuthMiddleware } from "../middlewares/gateway-middlewares";
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { GatewayRouteDto } from "../swagger/gateway-route.dto";
+import { GatewayService } from "./gateway.service";
+import { Response } from "express";
+import { Guard } from "../middlewares/guard";
 
 @ApiTags('Gateway')
 @Controller('gateway')
@@ -23,54 +24,59 @@ export class GatewayController {
     @ApiResponse({ status: 404, description: 'Rota não encontrada.' })
     @ApiResponse({ status: 500, description: 'Erro interno do servidor.' })
     @ApiBody({ type: GatewayRouteDto, required: false, description: 'Payload opcional para requisições POST e PUT' })
-    async handleRequest(@Request() req, @Body() body, @Response() res) {
+    async handleRequest(@Request() req, @Body() body, @Res() res: Response) {
+        this.logger.log(`Original URL: ${req.originalUrl}`);
+
+        const path = req.originalUrl.replace('/gateway', '');
+        this.logger.log(`Recebendo requisição para o caminho: ${path}`);
+
         const matchingRoute = routeMappings.find(route => {
-            const regex = new RegExp(`^${route.gatewayPath.replace(/:\w+/g, '\\w+')}$`);
-            return regex.test(req.path);
+            const regex = new RegExp(`^${route.gatewayPath.replace(/:[^/]+/g, '([^/]+)')}$`);
+            return regex.test(path);
         });
 
         if (!matchingRoute) {
+            this.logger.error(`Rota não encontrada: ${req.originalUrl}`);
             throw new HttpException('Route not found', HttpStatus.NOT_FOUND);
         }
 
-        const { service, targetPath, protected: isProtected, validatePayload } = matchingRoute;
+        this.logger.log(`Rota correspondente encontrada: ${JSON.stringify(matchingRoute)}`);
 
-        const paramsMatch = req.path.match(new RegExp(`^${matchingRoute.gatewayPath.replace(/:[^/]+/g, '([^/]+)')}$`));
+        const { service, protected: isProtected, validatePayload } = matchingRoute;
+
+        // Extração dos parâmetros da rota
+        const paramsMatch = new RegExp(`^${matchingRoute.gatewayPath.replace(/:[^/]+/g, '([^/]+)')}$`).exec(path);
+
         const paramKeys = matchingRoute.gatewayPath.match(/:[^/]+/g) || [] as string[];
+
         const params = paramKeys.reduce((acc, key, index) => {
             (acc as Record<string, string>)[key.replace(':', '')] = paramsMatch ? paramsMatch[index + 1] || '' : '';
             return acc;
         }, {} as Record<string, string>);
 
-        var finalPath = matchingRoute.targetPath;
+        // Substituição dos parâmetros na rota alvo
+        let finalPath = matchingRoute.targetPath;
         Object.entries(params).forEach(([key, value]) => {
             finalPath = finalPath.replace(`:${key}`, value);
         });
 
-        // Proteção (autenticação/validação de token)
         if (isProtected) {
-            const authMiddleware = new AuthMiddleware();
-            authMiddleware.use(req, res, () => { });
+            const guard = new Guard();
+            guard.use(req, res, () => { });
         }
 
         // Validação de Payload (se necessário)
-        if (validatePayload && (!body || Object.keys(body).length === 0)) {
-            throw new HttpException('Invalid payload', HttpStatus.BAD_REQUEST);
+        if (validatePayload && !body) {
+            throw new HttpException('Payload inválido', HttpStatus.BAD_REQUEST);
         }
 
         // Redirecionamento para o serviço alvo
         try {
-            const data = await this.gatewayService.forwardRequest(
-                service,
-                finalPath,
-                req.method,
-                body);
-            res.json(data);
+            const result = await this.gatewayService.forwardRequest(service, finalPath, req.method, body);
+            res.status(200).send(result);
         } catch (error) {
-            throw new HttpException(
-                `Error processing request: ${error.message}`,
-                error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-            );
+            this.logger.error(`Erro ao redirecionar a requisição: ${error.message}`);
+            res.status(error.response?.status || 500).send({ message: 'Erro interno do servidor' });
         }
     }
 }

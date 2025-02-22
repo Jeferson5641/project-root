@@ -1,14 +1,22 @@
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { EnvConfig } from './modules/environment/env-variables';
-import { Logger } from '@nestjs/common';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+import { EnvConfig } from './config/env-variables';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter
+    new FastifyAdapter(),
+  );
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
   );
 
   const config = new DocumentBuilder()
@@ -22,14 +30,46 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   // Habilitar logs globais
-  const logger = new Logger('Bootstrap');
-  app.useLogger(logger);
+  const logger = new Logger('Gateway');
+  app.use((req, res, next) => {
+    logger.log(`${req.method} ${req.url}`);
+    next();
+  });
 
   const envConfig = app.get(EnvConfig);
   const port = envConfig.port;
+
+  logger.log(`Auth Service URL: ${envConfig.authServiceUrl}`);
+  logger.log(`Data Service URL: ${envConfig.dataServiceUrl}`);
 
   await app.listen(port);
   console.log(`Gateway is running on http://localhost:${port}`);
   console.log(`Swagger is running on http://localhost:${port}/api-docs`);
 }
 bootstrap();
+
+// @Controller()
+// class TesteController {
+//   @Get()
+//   getHello(): string {
+//     return 'Hello World!';
+//   }
+
+// }
+// @Module({
+//   controllers: [TesteController],
+// })
+// class TesteApi { }
+
+// async function bootstrap() {
+//   const app = await NestFactory.create<NestFastifyApplication>(
+//     TesteApi,
+//   );
+
+//   const port = 3003;
+
+//   await app.listen(port);
+//   console.log(`Gateway is running on http://localhost:${port}`);
+//   console.log(`Swagger is running on http://localhost:${port}/api-docs`);
+// }
+// bootstrap();

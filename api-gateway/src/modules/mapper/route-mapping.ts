@@ -13,7 +13,7 @@ export const routeMappings = [
         service: 'auth',
         method: 'POST',
         protected: false,
-        validatePayload: true,
+        validatePayload: false,
     },
     {
         gatewayPath: '/users/one/:id',
@@ -44,7 +44,7 @@ export const routeMappings = [
         targetPath: '/users/delete/:id',
         service: 'data',
         method: 'DELETE',
-        protected: true,
+        protected: false,
         validatePayload: false,
     },
 ];
