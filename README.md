@@ -57,11 +57,11 @@ O serviço de dados (`data-service`) é o núcleo de gestão de informações no
 | **RxJS**       | Biblioteca para programação reativa, usada em operações assíncronas e fluxos de dados. |
 | **Bcrypt**     | Utilizado para segurança adicional em algumas operações de dados.                      |
 
-#### **Em Desenvolvimento**
+<!--#### **Em Desenvolvimento**
 
 - Expansão de suporte a novos bancos de dados, caso necessário.
 - Integração com serviços externos para sincronização de dados.
-
+-->
 ---
 
 ## Como Executar o Projeto
