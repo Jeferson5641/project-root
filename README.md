@@ -24,7 +24,6 @@ O serviço de autenticação (`auth-services`) é responsável por gerenciar o c
 | **NestJS**               | Framework para construção de APIs escaláveis e modulares com TypeScript.      |
 | **TypeScript**           | Superset do JavaScript com tipagem estática, garantindo maior confiabilidade. |
 | **JWT (JSON Web Token)** | Utilizado para geração e validação de tokens de autenticação.                 |
-| **Bcrypt**               | Biblioteca para hashing seguro de senhas.                                     |
 | **Axios**                | Biblioteca HTTP para comunicação entre serviços.                              |
 | **TypeORM**              | ORM utilizado para a interação com o banco de dados relacional (MySQL).       |
 | **MySQL2**               | Driver para integração com o banco de dados MySQL.                            |
