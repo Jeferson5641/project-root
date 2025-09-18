@@ -24,6 +24,7 @@ O serviço de autenticação (`auth-services`) é responsável por gerenciar o c
 | **NestJS**               | Framework para construção de APIs escaláveis e modulares com TypeScript.      |
 | **TypeScript**           | Superset do JavaScript com tipagem estática, garantindo maior confiabilidade. |
 | **JWT (JSON Web Token)** | Utilizado para geração e validação de tokens de autenticação.                 |
+| **Bcrypt**               | Utilizado para segurança adicional em algumas operações de dados.             |
 | **Axios**                | Biblioteca HTTP para comunicação entre serviços.                              |
 | **TypeORM**              | ORM utilizado para a interação com o banco de dados relacional (MySQL).       |
 | **MySQL2**               | Driver para integração com o banco de dados MySQL.                            |
@@ -54,7 +55,6 @@ O serviço de dados (`data-service`) é o núcleo de gestão de informações no
 | **TypeORM**    | ORM utilizado para a interação com bancos de dados relacionais.                        |
 | **MySQL2**     | Driver para integração com o banco de dados MySQL.                                     |
 | **RxJS**       | Biblioteca para programação reativa, usada em operações assíncronas e fluxos de dados. |
-| **Bcrypt**     | Utilizado para segurança adicional em algumas operações de dados.                      |
 
 <!--#### **Em Desenvolvimento**
 
