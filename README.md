@@ -27,12 +27,12 @@ O serviço de autenticação (`auth-services`) é responsável por gerenciar o c
 | **Axios**                | Biblioteca HTTP para comunicação entre serviços.                              |
 | **TypeORM**              | ORM utilizado para a interação com o banco de dados relacional (MySQL).       |
 | **MySQL2**               | Driver para integração com o banco de dados MySQL.                            |
-
+<!--
 #### **Em Desenvolvimento**
 
 - Integração com um API Gateway para unificação dos microsserviços.
 - Suporte a Docker para orquestração de contêineres.
-
+-->
 ---
 
 ### Data-Service
